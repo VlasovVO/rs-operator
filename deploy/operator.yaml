@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myrs-operator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: myrs-operator
+  template:
+    metadata:
+      labels:
+        name: myrs-operator
+    spec:
+      serviceAccountName: myrs-operator
+      containers:
+        - name: myrs-operator
+          # Replace this with the built image name
+          image: vlasovvo/myrs-operator:latest
+          command:
+          - myrs-operator
+          imagePullPolicy: Always
+          env:
+            - name: WATCH_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: OPERATOR_NAME
+              value: "myrs-operator"
