@@ -103,7 +103,6 @@ func (r *ReconcileMyRS) Reconcile(request reconcile.Request) (reconcile.Result, 
 	}
 	lbls := labels.Set{
 		"app":     MyRS.Name,
-//		"version": "v0.1",
 	}
 	existingPods := &corev1.PodList{}
 	err = r.client.List(context.TODO(),
@@ -170,7 +169,6 @@ func (r *ReconcileMyRS) Reconcile(request reconcile.Request) (reconcile.Result, 
 func newPodForCR(cr *myv1alpha1.MyRS) *corev1.Pod {
 	labels := map[string]string{
 		"app": 	   cr.Name,
-//		"version": "v0.1",
 	}
 	for SelectorKey, SelectorValue := range cr.Spec.Selector.MatchLabels {
 		labels[SelectorKey] = SelectorValue
