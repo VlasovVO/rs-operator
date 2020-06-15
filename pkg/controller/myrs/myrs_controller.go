@@ -116,14 +116,16 @@ func (r *ReconcileMyRS) Reconcile(request reconcile.Request) (reconcile.Result, 
 		return reconcile.Result{}, err
 	}
 
-	existingPodNames := []string{}
+	existingPodNames  := []string{}
+	existingPodImages := []string{}
 
 	for _, pod := range existingPods.Items {
 		if pod.GetObjectMeta().GetDeletionTimestamp() != nil {
 			continue
 		}
 		if pod.Status.Phase == corev1.PodPending || pod.Status.Phase == corev1.PodRunning {
-			existingPodNames = append(existingPodNames, pod.GetObjectMeta().GetName())
+			existingPodNames  = append(existingPodNames, pod.GetObjectMeta().GetName())
+			existingPodImages = append(existingPodImages, pod.Spec.Containers[0].Image)
 		}
 	}
 
@@ -140,6 +142,18 @@ func (r *ReconcileMyRS) Reconcile(request reconcile.Request) (reconcile.Result, 
 			return reconcile.Result{}, err
 		}
 	}
+
+	if len(existingPodImages) != 0 && existingPodImages[0] != MyRS.Spec.Template.Spec.Containers[0].Image {
+		for _, pod := range existingPods.Items{
+			err = r.client.Delete(context.TODO(), &pod)
+			if err != nil {
+				reqLogger.Error(err, "failed to update the myRS")
+			return reconcile.Result{}, err
+			}
+		}
+	}
+
+
 	if int32(len(existingPodNames)) > *MyRS.Spec.Replicas {
 		reqLogger.Info("Deleting a pod in the myRS", "expected replicas", MyRS.Spec.Replicas, "Pod.Names", existingPodNames)
 		pod := existingPods.Items[0]
@@ -162,6 +176,9 @@ func (r *ReconcileMyRS) Reconcile(request reconcile.Request) (reconcile.Result, 
 			return reconcile.Result{}, err
 		}
 	}
+
+
+//	return reconcile.Result{Requeue: true}, nil
 	return reconcile.Result{Requeue: true}, nil
 }
 
