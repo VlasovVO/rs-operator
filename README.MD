@@ -23,7 +23,7 @@ $ kubectl apply -f deploy/
 
 ## Запуск
 
-Пример кастомного ресурса [Можно посмотреть тут]() и при необходимости создать свой
+Пример кастомного ресурса [Можно посмотреть тут](https://github.com/VlasovVO/rs-operator/blob/master/deploy/crds/my.replica.com_v1alpha1_myrs_cr.yaml) и при необходимости создать свой
 
 ```bash
 # Добавить предоставленый манифест CR можно командой
